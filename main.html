@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bobro Dobro Game</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f0f8ff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #ff6b6b;
+            margin-bottom: 30px;
+        }
+        .game-area {
+            margin: 30px 0;
+        }
+        input {
+            padding: 10px;
+            font-size: 18px;
+            width: 100px;
+            text-align: center;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+            min-height: 60px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+        .bober-image {
+            width: 150px;
+            height: 150px;
+            margin: 20px auto;
+            background-color: #e9ecef;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bobro Dobro Game</h1>
+
+        <div class="bober-image">🦫</div>
+
+        <div class="game-area">
+            <p>Guess the number between 0 and 100:</p>
+            <input type="number" id="guessInput" min="0" max="100">
+            <button id="guessButton">Guess</button>
+        </div>
+
+        <div class="result" id="result"></div>
+
+        <div id="winMessage" class="hidden">
+            <h2>Congratulations! 🎉</h2>
+            <button id="playAgainButton">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        class BobroDobro {
+            constructor() {
+                this.bad = [
+                    "Bobrito Durachito",
+                    "Bobrito Molto_Tupito",
+                    "Bobrito Debilito",
+                    "Bobrito Zadolbito",
+                    "Bobrito Tolstito",
+                    "Bobrito Super_Zgernito"
+                ];
+                this.resp = [
+                    "Bobrito Bisnesito",
+                    "Presidento Bobrito",
+                    "Bobrito Lamborgini_Vodito",
+                    "Bobrito Spidermenito"
+                ];
+                this.targetNumber = Math.floor(Math.random() * 101);
+            }
+
+            yourBoberIs(rand_pers, rand_comp) {
+                if (rand_comp === rand_pers) {
+                    return this.resp[Math.floor(Math.random() * this.resp.length)];
+                }
+                return this.bad[Math.floor(Math.random() * this.bad.length)];
+            }
+        }
+
+        const bobersi = new BobroDobro();
+        const guessInput = document.getElementById('guessInput');
+        const guessButton = document.getElementById('guessButton');
+        const resultDiv = document.getElementById('result');
+        const winMessage = document.getElementById('winMessage');
+        const playAgainButton = document.getElementById('playAgainButton');
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function checkGuess() {
+            const userGuess = parseInt(guessInput.value);
+
+            if (isNaN(userGuess) || userGuess < 0 || userGuess > 100) {
+                resultDiv.textContent = "Please enter a number between 0 and 100";
+                return;
+            }
+
+            if (bobersi.targetNumber !== userGuess) {
+                if (bobersi.targetNumber > userGuess) {
+                    const yourBober = bobersi.yourBoberIs(bobersi.targetNumber, userGuess);
+                    speak(`Nope, small number, your bober is: ${yourBober}`);
+                    resultDiv.innerHTML = `&lt;, your bober is: <strong>${yourBober}</strong>`;
+                } else {
+                    const yourBober = bobersi.yourBoberIs(bobersi.targetNumber, userGuess);
+                    speak(`Nope, big number, your bober is: ${yourBober}`);
+                    resultDiv.innerHTML = `&gt;, your bober is: <strong>${yourBober}</strong>`;
+                }
+            } else {
+                const winningBober = bobersi.yourBoberIs(bobersi.targetNumber, userGuess);
+                speak(`Yes, your bober is: ${winningBober}, you are win`);
+                resultDiv.innerHTML = `Yes, your bober is: <strong>${winningBober}</strong>`;
+
+                // Show win message
+                document.querySelector('.game-area').classList.add('hidden');
+                winMessage.classList.remove('hidden');
+            }
+
+            guessInput.value = '';
+            guessInput.focus();
+        }
+
+        function playAgain() {
+            bobersi.targetNumber = Math.floor(Math.random() * 101);
+            resultDiv.textContent = '';
+            winMessage.classList.add('hidden');
+            document.querySelector('.game-area').classList.remove('hidden');
+            guessInput.focus();
+        }
+
+        guessButton.addEventListener('click', checkGuess);
+        playAgainButton.addEventListener('click', playAgain);
+
+        guessInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkGuess();
+            }
+        });
+
+        guessInput.focus();
+    </script>
+</body>
+</html>
